@@ -3,10 +3,12 @@
 class EmployeesController < ApplicationController
   before_action :authenticate_admin!
   before_action :set_employee, only: %i[show edit update]
-  before_action :load_job_titles, only: %i[new create edit update]
+  before_action :load_job_titles, only: %i[index new create edit update]
 
   def index
-    @employees = Employee.includes(:job_title).order(:last_name, :first_name).paginate(page: params[:page])
+    @employees = Employee.build_criteria(filter_params)
+      .includes(:job_title)
+      .paginate(page: params[:page])
   end
 
   def show; end
@@ -52,5 +54,9 @@ class EmployeesController < ApplicationController
 
   def update_employee_params
     params.require(:employee).permit(:first_name, :last_name, :country, :job_title_id)
+  end
+
+  def filter_params
+    params.permit(:search, :page, fltrs: {})
   end
 end

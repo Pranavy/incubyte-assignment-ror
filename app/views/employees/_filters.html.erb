@@ -1,0 +1,62 @@
+<%# locals: filter_active (boolean) %>
+<button class="btn btn-outline-secondary d-inline-flex align-items-center gap-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#employeeFilters" aria-controls="employeeFilters">
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-funnel" viewBox="0 0 16 16" aria-hidden="true">
+    <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.128 3.637A.5.5 0 0 1 1 3.28v-2zm1 .5v1.308l4.372 4.858A.5.5 0 0 1 6 7.114v5.586L11 13.5V7.114a.5.5 0 0 1 .128-.334L13.5 3.308V2H2z"/>
+  </svg>
+  Filters
+  <% if filter_active %>
+    <span class="badge text-bg-primary rounded-pill">On</span>
+  <% end %>
+</button>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="employeeFilters" aria-labelledby="employeeFiltersLabel">
+  <div class="offcanvas-header border-bottom">
+    <h2 class="offcanvas-title h5 mb-0" id="employeeFiltersLabel">Filter employees</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <%= form_with url: employees_path, method: :get, local: true, class: "d-flex flex-column gap-3" do %>
+      <div>
+        <%= label_tag :search, "Search name", class: "form-label" %>
+        <%= text_field_tag :search, params[:search], class: "form-control", placeholder: "First or last name", autocomplete: "off" %>
+      </div>
+
+      <div>
+        <%= label_tag "fltrs[country]", "Country", class: "form-label" %>
+        <%= select_tag "fltrs[country]",
+              options_for_select([["Any country", ""]] + Countries.options_for_select, params.dig(:fltrs, :country)),
+              class: "form-select" %>
+      </div>
+
+      <div>
+        <%= label_tag "fltrs[job_title_id]", "Job title", class: "form-label" %>
+        <%= select_tag "fltrs[job_title_id]",
+              options_from_collection_for_select(@job_titles, :id, :title, params.dig(:fltrs, :job_title_id)),
+              { include_blank: "Any job title", class: "form-select" } %>
+      </div>
+
+      <div>
+        <%= label_tag "fltrs[sort]", "Sort by", class: "form-label" %>
+        <%= select_tag "fltrs[sort]",
+              options_for_select(
+                [
+                  ["Last name (A–Z)", "last_name.asc"],
+                  ["Last name (Z–A)", "last_name.desc"],
+                  ["First name (A–Z)", "first_name.asc"],
+                  ["Salary (low to high)", "salary.asc"],
+                  ["Salary (high to low)", "salary.desc"],
+                  ["Recently added", "created_at.desc"],
+                  ["Oldest first", "created_at.asc"]
+                ],
+                params.dig(:fltrs, :sort).presence || "last_name.asc"
+              ),
+              class: "form-select" %>
+      </div>
+
+      <div class="d-grid gap-2 mt-2">
+        <%= submit_tag "Apply filters", class: "btn btn-primary" %>
+        <%= link_to "Clear all", employees_path, class: "btn btn-outline-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

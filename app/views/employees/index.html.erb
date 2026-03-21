@@ -1,9 +1,14 @@
 <% content_for :title, "Employees — Incubyte Assignment" %>
 
+<% filter_active = params[:search].present? || params[:fltrs].present? %>
+
 <div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <h1 class="h3 mb-0">Employees</h1>
-    <%= link_to "New employee", new_employee_path, class: "btn btn-primary" %>
+    <div class="d-flex gap-2 align-items-center">
+      <%= render "filters", filter_active: filter_active %>
+      <%= link_to "New employee", new_employee_path, class: "btn btn-primary" %>
+    </div>
   </div>
 
   <% if @employees.any? %>
@@ -35,8 +40,14 @@
       </table>
     </div>
     <div class="d-flex justify-content-center mt-3">
-      <%= will_paginate @employees %>
+      <%= will_paginate @employees, params: request.query_parameters.except(:controller, :action) %>
     </div>
+  <% elsif filter_active %>
+    <p class="text-muted">
+      No employees match these filters.
+      <%= link_to "Clear filters", employees_path, class: "text-decoration-none" %>
+      or <%= link_to "add an employee", new_employee_path %>.
+    </p>
   <% else %>
     <p class="text-muted">No employees yet. <%= link_to "Add one", new_employee_path %>.</p>
   <% end %>
