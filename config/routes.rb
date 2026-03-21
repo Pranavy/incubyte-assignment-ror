@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   resources :job_titles, except: :destroy
+  resources :tds_rules, only: %i[index show new create edit update]
 
   root "home#index"
 end

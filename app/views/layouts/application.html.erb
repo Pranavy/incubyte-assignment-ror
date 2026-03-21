@@ -22,7 +22,7 @@
     <link rel="apple-touch-icon" href="/icon.png">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
@@ -43,5 +43,17 @@
     <main class="flex-grow-1">
       <%= yield %>
     </main>
+    <script>
+      (function () {
+        function initBootstrapTooltips() {
+          if (typeof bootstrap === "undefined" || !bootstrap.Tooltip) return;
+          document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+            bootstrap.Tooltip.getOrCreateInstance(el);
+          });
+        }
+        document.addEventListener("DOMContentLoaded", initBootstrapTooltips);
+        document.addEventListener("turbo:load", initBootstrapTooltips);
+      })();
+    </script>
   </body>
 </html>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_21_124936) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_21_154323) do
   create_table "admins", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -35,7 +35,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_124936) do
     t.datetime "created_at", null: false
     t.date "effective_from", null: false
     t.date "effective_to"
-    t.decimal "tds_rate", precision: 7, scale: 4, null: false
+    t.decimal "tds_rate", precision: 7, scale: 4, default: "0.0", null: false
     t.datetime "updated_at", null: false
     t.index ["country", "effective_from"], name: "index_tds_rules_on_country_and_effective_from", unique: true
     t.index ["country"], name: "index_tds_rules_on_country"

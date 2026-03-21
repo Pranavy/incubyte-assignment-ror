@@ -1,3 +1,9 @@
+/* Wider Bootstrap tooltip for long TDS help text */
+.tds-rate-tooltip .tooltip-inner {
+  max-width: min(22rem, 90vw);
+  text-align: left;
+}
+
 /*
  * This is a manifest file that'll be compiled into application.css.
  *

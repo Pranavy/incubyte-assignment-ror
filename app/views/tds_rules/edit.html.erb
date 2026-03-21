@@ -1,0 +1,15 @@
+<% content_for :title, "Edit TDS rule — #{@tds_rule.country}" %>
+
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><%= link_to "TDS rules", tds_rules_path %></li>
+      <li class="breadcrumb-item"><%= link_to Countries.label_for(@tds_rule.country) || @tds_rule.country, tds_rule_path(@tds_rule) %></li>
+      <li class="breadcrumb-item active" aria-current="page">Edit</li>
+    </ol>
+  </nav>
+
+  <h1 class="h3 mb-4">Edit TDS rule</h1>
+
+  <%= render "form" %>
+</div>

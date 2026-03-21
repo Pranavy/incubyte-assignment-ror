@@ -1,0 +1,14 @@
+<% content_for :title, "New TDS rule — Incubyte Assignment" %>
+
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><%= link_to "TDS rules", tds_rules_path %></li>
+      <li class="breadcrumb-item active" aria-current="page">New</li>
+    </ol>
+  </nav>
+
+  <h1 class="h3 mb-4">New TDS rule</h1>
+
+  <%= render "form" %>
+</div>

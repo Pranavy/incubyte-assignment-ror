@@ -1,0 +1,67 @@
+<% if @tds_rule.errors.any? %>
+  <div class="alert alert-danger" role="alert">
+    <h2 class="h6"><%= pluralize(@tds_rule.errors.count, "error") %> prevented this TDS rule from being saved:</h2>
+    <ul class="mb-0 ps-3">
+      <% @tds_rule.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: @tds_rule, local: true, html: { class: "vstack gap-3" } do |f| %>
+  <div>
+    <%= f.label :country, class: "form-label" %>
+    <% if @tds_rule.persisted? %>
+      <p class="form-control-plaintext border rounded px-3 py-2 mb-0 bg-light"><%= Countries.label_for(@tds_rule.country) || @tds_rule.country %></p>
+      <p class="form-text">Country cannot be changed. Create a new rule for another country or date range.</p>
+      <%= f.hidden_field :country %>
+    <% else %>
+      <%= f.select :country,
+                   Countries.options_for_select,
+                   { prompt: "Select country" },
+                   class: "form-select",
+                   required: true %>
+    <% end %>
+  </div>
+
+  <div>
+    <%= f.label :tds_rate, class: "form-label d-flex align-items-center flex-wrap gap-2" do %>
+      <span>TDS rate (decimal, e.g. 0.10 for 10%)</span>
+      <button type="button"
+              class="btn btn-link text-primary p-0 border-0 align-baseline lh-1"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              data-bs-custom-class="tds-rate-tooltip"
+              data-bs-title="Default TDS rate is 0%. For India use 0.10 (10%) and for the United States use 0.12 (12%) per policy. All other countries stay at 0% unless you add a rule.  "
+              aria-label="About default TDS">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+        </svg>
+      </button>
+    <% end %>
+    <%= f.number_field :tds_rate,
+                       class: "form-control",
+                       step: "any",
+                       min: 0,
+                       max: 1,
+                       required: true %>
+  </div>
+
+  <div>
+    <%= f.label :effective_from, class: "form-label" %>
+    <%= f.date_field :effective_from, class: "form-control", required: true %>
+  </div>
+
+  <div>
+    <%= f.label :effective_to, class: "form-label" %>
+    <span class="form-text d-block mb-1">Leave blank for open-ended (no end date).</span>
+    <%= f.date_field :effective_to, class: "form-control" %>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= f.submit class: "btn btn-primary" %>
+    <%= link_to "Cancel", (@tds_rule.persisted? ? tds_rule_path(@tds_rule) : tds_rules_path), class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>

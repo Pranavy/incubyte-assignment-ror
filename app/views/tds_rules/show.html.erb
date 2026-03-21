@@ -1,0 +1,24 @@
+<% content_for :title, "TDS rule — #{@tds_rule.country}" %>
+
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><%= link_to "TDS rules", tds_rules_path %></li>
+      <li class="breadcrumb-item active" aria-current="page"><%= Countries.label_for(@tds_rule.country) || @tds_rule.country %></li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <h1 class="h3 mb-0"><%= Countries.label_for(@tds_rule.country) || @tds_rule.country %></h1>
+    <%= link_to "Edit", edit_tds_rule_path(@tds_rule), class: "btn btn-primary" %>
+  </div>
+
+  <dl class="row">
+    <dt class="col-sm-3">TDS rate</dt>
+    <dd class="col-sm-9"><%= number_to_percentage(@tds_rule.tds_rate * 100, precision: 4) %></dd>
+    <dt class="col-sm-3">Effective from</dt>
+    <dd class="col-sm-9"><%= l(@tds_rule.effective_from) %></dd>
+    <dt class="col-sm-3">Effective to</dt>
+    <dd class="col-sm-9"><%= @tds_rule.effective_to.present? ? l(@tds_rule.effective_to) : "Open-ended" %></dd>
+  </dl>
+</div>
