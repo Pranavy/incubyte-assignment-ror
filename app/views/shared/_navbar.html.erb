@@ -1,0 +1,14 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-0">
+  <div class="container">
+    <%= link_to "Incubyte Assignment", root_path, class: "navbar-brand" %>
+    <div class="navbar-nav ms-auto flex-row gap-2 align-items-center">
+      <% if admin_signed_in? %>
+        <span class="navbar-text text-white-50 small d-none d-sm-inline"><%= current_admin.email %></span>
+        <%= link_to "Sign out", destroy_admin_session_path, data: { turbo_method: :delete }, class: "btn btn-outline-light btn-sm" %>
+      <% else %>
+        <%= link_to "Sign in", new_admin_session_path, class: "nav-link py-1" %>
+        <%= link_to "Sign up", new_admin_registration_path, class: "btn btn-primary btn-sm" %>
+      <% end %>
+    </div>
+  </div>
+</nav>

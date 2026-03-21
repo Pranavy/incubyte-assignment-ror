@@ -1,0 +1,16 @@
+<%= admin_auth_card(title: "Forgot your password?") do %>
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post, class: "vstack gap-3" }) do |f| %>
+    <%= render "admins/shared/error_messages", resource: resource %>
+
+    <div>
+      <%= f.label :email, class: "form-label" %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control" %>
+    </div>
+
+    <div>
+      <%= f.submit "Send reset instructions", class: "btn btn-primary w-100" %>
+    </div>
+  <% end %>
+
+  <%= render "admins/shared/links" %>
+<% end %>

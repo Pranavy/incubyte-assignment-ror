@@ -26,7 +26,8 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body class="d-flex flex-column min-vh-100">
+    <%= render "shared/navbar" %>
     <% if notice.present? %>
       <div class="alert alert-info alert-dismissible fade show m-3" role="alert">
         <%= notice %>
@@ -39,6 +40,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     <% end %>
-    <%= yield %>
+    <main class="flex-grow-1">
+      <%= yield %>
+    </main>
   </body>
 </html>

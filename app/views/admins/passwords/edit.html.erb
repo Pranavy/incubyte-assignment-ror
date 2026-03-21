@@ -1,0 +1,25 @@
+<%= admin_auth_card(title: "Change your password") do %>
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, class: "vstack gap-3" }) do |f| %>
+    <%= render "admins/shared/error_messages", resource: resource %>
+    <%= f.hidden_field :reset_password_token %>
+
+    <div>
+      <%= f.label :password, "New password", class: "form-label" %>
+      <% if @minimum_password_length %>
+        <span class="form-text d-block mb-1"><%= @minimum_password_length %> characters minimum</span>
+      <% end %>
+      <%= f.password_field :password, autofocus: true, autocomplete: "new-password", class: "form-control" %>
+    </div>
+
+    <div>
+      <%= f.label :password_confirmation, "Confirm new password", class: "form-label" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "form-control" %>
+    </div>
+
+    <div>
+      <%= f.submit "Change my password", class: "btn btn-primary w-100" %>
+    </div>
+  <% end %>
+
+  <%= render "admins/shared/links" %>
+<% end %>
