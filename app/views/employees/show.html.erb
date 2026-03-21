@@ -1,0 +1,24 @@
+<% content_for :title, "#{@employee.first_name} #{@employee.last_name} — Employee" %>
+
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><%= link_to "Employees", employees_path %></li>
+      <li class="breadcrumb-item active" aria-current="page"><%= @employee.first_name %> <%= @employee.last_name %></li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <h1 class="h3 mb-0"><%= @employee.first_name %> <%= @employee.last_name %></h1>
+    <%= link_to "Edit", edit_employee_path(@employee), class: "btn btn-primary" %>
+  </div>
+
+  <dl class="row">
+    <dt class="col-sm-3">Job title</dt>
+    <dd class="col-sm-9"><%= @employee.job_title.title %></dd>
+    <dt class="col-sm-3">Country</dt>
+    <dd class="col-sm-9"><%= Countries.label_for(@employee.country) || @employee.country %></dd>
+    <dt class="col-sm-3">Salary (gross)</dt>
+    <dd class="col-sm-9"><%= number_to_currency(@employee.salary) %></dd>
+  </dl>
+</div>
