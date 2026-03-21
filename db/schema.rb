@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_21_115821) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_21_124936) do
   create_table "admins", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
@@ -28,5 +28,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_115821) do
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.index ["title"], name: "index_job_titles_on_title", unique: true
+  end
+
+  create_table "tds_rules", force: :cascade do |t|
+    t.string "country", null: false
+    t.datetime "created_at", null: false
+    t.date "effective_from", null: false
+    t.date "effective_to"
+    t.decimal "tds_rate", precision: 7, scale: 4, null: false
+    t.datetime "updated_at", null: false
+    t.index ["country", "effective_from"], name: "index_tds_rules_on_country_and_effective_from", unique: true
+    t.index ["country"], name: "index_tds_rules_on_country"
   end
 end
