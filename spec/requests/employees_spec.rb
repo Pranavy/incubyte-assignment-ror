@@ -60,7 +60,7 @@ RSpec.describe "Employees (admin)", type: :request do
         16.times do |i|
           Employee.create!(
             first_name: "Page",
-            last_name: format("%03d", i),
+            last_name: format("E%04d", i),
             country: "IN",
             job_title: engineer_title,
             salary: 48_765
@@ -70,9 +70,34 @@ RSpec.describe "Employees (admin)", type: :request do
         get employees_path(page: 2)
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include("015")
-        expect(response.body).not_to include("000")
+        expect(response.body).to include("E0015")
+        expect(response.body).not_to include("E0000")
         expect(response.body).to include("pagination")
+      end
+
+      it "filters by country when fltrs[country] is set" do
+        Employee.create!(
+          first_name: "Alice",
+          last_name: "UnitedStates",
+          country: "US",
+          job_title: engineer_title,
+          salary: 60_000
+        )
+        Employee.create!(
+          first_name: "Bob",
+          last_name: "IndiaOnly",
+          country: "IN",
+          job_title: engineer_title,
+          salary: 50_000
+        )
+
+        get employees_path, params: { fltrs: { country: "US" } }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Alice")
+        expect(response.body).to include("United States")
+        expect(response.body).not_to include("Bob")
+        expect(response.body).not_to include("IndiaOnly")
       end
     end
 

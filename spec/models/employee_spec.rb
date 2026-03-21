@@ -75,4 +75,33 @@ RSpec.describe Employee, type: :model do
       expect(employee).to be_valid
     end
   end
+
+  describe ".build_criteria" do
+    it "chains filter_by_country from fltrs" do
+      other = JobTitle.create!(title: "Other")
+      us = described_class.create!(valid_attributes.merge(country: "US", job_title: other))
+      described_class.create!(valid_attributes.merge(country: "IN"))
+
+      result = described_class.build_criteria({ fltrs: { country: "US" } })
+
+      expect(result.to_a).to contain_exactly(us)
+    end
+
+    it "applies filter_by_search when search is present" do
+      a = described_class.create!(valid_attributes.merge(first_name: "Zara", last_name: "Unique"))
+      described_class.create!(valid_attributes.merge(first_name: "Other", last_name: "Person"))
+
+      result = described_class.build_criteria({ search: "Zara" })
+
+      expect(result.to_a).to contain_exactly(a)
+    end
+
+    it "ignores unknown fltrs keys when no matching scope exists" do
+      described_class.create!(valid_attributes)
+
+      expect do
+        described_class.build_criteria({ fltrs: { unknown_field: "x" } })
+      end.not_to raise_error
+    end
+  end
 end
