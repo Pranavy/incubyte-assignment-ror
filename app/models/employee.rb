@@ -10,6 +10,11 @@ class Employee < ApplicationRecord
   validates :country, presence: true, inclusion: { in: Countries::KEYS, message: "is not an allowed country code" }
   validates :salary, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
+
+  def full_name
+    "#{first_name} #{last_name}"
+  end
+
   private
 
   def normalize_country
