@@ -1,0 +1,15 @@
+<% content_for :title, "Edit #{@job_title.title} — Job title" %>
+
+<div class="container py-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><%= link_to "Job titles", job_titles_path %></li>
+      <li class="breadcrumb-item"><%= link_to @job_title.title, job_title_path(@job_title) %></li>
+      <li class="breadcrumb-item active" aria-current="page">Edit</li>
+    </ol>
+  </nav>
+
+  <h1 class="h3 mb-4">Edit job title</h1>
+
+  <%= render "form" %>
+</div>
