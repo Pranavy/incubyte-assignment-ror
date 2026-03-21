@@ -34,6 +34,9 @@
         </tbody>
       </table>
     </div>
+    <div class="d-flex justify-content-center mt-3">
+      <%= will_paginate @employees %>
+    </div>
   <% else %>
     <p class="text-muted">No employees yet. <%= link_to "Add one", new_employee_path %>.</p>
   <% end %>

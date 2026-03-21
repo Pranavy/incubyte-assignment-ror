@@ -41,6 +41,7 @@ gem "thruster", require: false
 gem "image_processing", "~> 1.2"
 
 gem "devise"
+gem "will_paginate", "~> 4.0"
 
 group :development, :test do
   gem "rspec-rails", "~> 8.0"

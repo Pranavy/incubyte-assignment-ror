@@ -6,7 +6,7 @@ class EmployeesController < ApplicationController
   before_action :load_job_titles, only: %i[new create edit update]
 
   def index
-    @employees = Employee.includes(:job_title).order(:last_name, :first_name)
+    @employees = Employee.includes(:job_title).order(:last_name, :first_name).paginate(page: params[:page])
   end
 
   def show; end

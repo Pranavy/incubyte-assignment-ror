@@ -5,7 +5,7 @@ class TdsRulesController < ApplicationController
   before_action :set_tds_rule, only: %i[show edit update]
 
   def index
-    @tds_rules = TdsRule.order(:country, effective_from: :desc)
+    @tds_rules = TdsRule.order(:country, effective_from: :desc).paginate(page: params[:page])
   end
 
   def show; end

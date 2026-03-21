@@ -55,6 +55,25 @@ RSpec.describe "Employees (admin)", type: :request do
         expect(response.body).to include("Turing")
         expect(response.body).to include("Engineer")
       end
+
+      it "paginates with page param when there are more records than per page" do
+        16.times do |i|
+          Employee.create!(
+            first_name: "Page",
+            last_name: format("%03d", i),
+            country: "IN",
+            job_title: engineer_title,
+            salary: 48_765
+          )
+        end
+
+        get employees_path(page: 2)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("015")
+        expect(response.body).not_to include("000")
+        expect(response.body).to include("pagination")
+      end
     end
 
     describe "GET /employees/new" do

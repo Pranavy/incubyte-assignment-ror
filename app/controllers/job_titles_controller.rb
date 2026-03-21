@@ -5,7 +5,7 @@ class JobTitlesController < ApplicationController
   before_action :set_job_title, only: %i[show edit update]
 
   def index
-    @job_titles = JobTitle.order(:title)
+    @job_titles = JobTitle.order(:title).paginate(page: params[:page])
   end
 
   def show; end
