@@ -12,6 +12,7 @@ Rails.application.routes.draw do
 
   resources :job_titles, except: :destroy
   resources :tds_rules, only: %i[index show new create edit update]
+  resources :employees, only: %i[index new create show edit update]
 
   root "home#index"
 end
