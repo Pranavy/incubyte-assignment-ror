@@ -3,6 +3,12 @@
 class TdsRule < ApplicationRecord
   OPEN_END = Date.new(9999, 12, 31)
 
+  # When no row applies for (country, as_of), these defaults apply for net salary (gross × (1 − rate)).
+  DEFAULT_TDS_RATE_BY_COUNTRY = {
+    "IN" => BigDecimal("0.10"),
+    "US" => BigDecimal("0.12")
+  }.freeze
+
   before_validation :normalize_country
 
   validates :country, presence: true, inclusion: { in: Countries::KEYS, message: "is not an allowed country code" }
@@ -12,6 +18,27 @@ class TdsRule < ApplicationRecord
   validates :effective_from, uniqueness: { scope: :country }
   validate :effective_to_after_effective_from
   validate :no_overlapping_country_ranges
+
+  # Rate in effect for +country+ on +as_of+ (0..1). Uses the matching DB rule if any; otherwise IN 10%, US 12%, else 0%.
+  def self.effective_tds_rate_for_country(country, as_of: Date.current)
+    code = country.to_s.upcase
+    return default_tds_rate_for_country(code) unless Countries.valid_key?(code)
+
+    rule = applicable_rule_for_country_on(code, as_of)
+    rule ? rule.tds_rate : default_tds_rate_for_country(code)
+  end
+
+  def self.default_tds_rate_for_country(country_code)
+    DEFAULT_TDS_RATE_BY_COUNTRY[country_code.to_s.upcase] || BigDecimal("0")
+  end
+
+  def self.applicable_rule_for_country_on(country_code, as_of)
+    where(country: country_code)
+      .where("effective_from <= ?", as_of)
+      .where("effective_to IS NULL OR effective_to >= ?", as_of)
+      .order(effective_from: :desc)
+      .first
+  end
 
   private
 

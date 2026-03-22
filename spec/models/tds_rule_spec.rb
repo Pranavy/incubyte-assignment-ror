@@ -121,4 +121,36 @@ RSpec.describe TdsRule, type: :model do
       expect(other).to be_valid
     end
   end
+
+  describe ".effective_tds_rate_for_country" do
+    let(:mid_2024) { Date.new(2024, 6, 15) }
+
+    it "returns the database rate when a rule applies on that date" do
+      described_class.create!(
+        country: "IN",
+        tds_rate: BigDecimal("0.08"),
+        effective_from: Date.new(2024, 1, 1),
+        effective_to: nil
+      )
+      expect(described_class.effective_tds_rate_for_country("IN", as_of: mid_2024)).to eq(BigDecimal("0.08"))
+    end
+
+    it "returns default 10% for IN when no rule covers that date" do
+      described_class.create!(
+        country: "IN",
+        tds_rate: BigDecimal("0.08"),
+        effective_from: Date.new(2025, 1, 1),
+        effective_to: nil
+      )
+      expect(described_class.effective_tds_rate_for_country("IN", as_of: mid_2024)).to eq(BigDecimal("0.10"))
+    end
+
+    it "returns default 12% for US when no rule exists" do
+      expect(described_class.effective_tds_rate_for_country("US", as_of: mid_2024)).to eq(BigDecimal("0.12"))
+    end
+
+    it "returns 0 for other countries when no rule exists" do
+      expect(described_class.effective_tds_rate_for_country("DE", as_of: mid_2024)).to eq(BigDecimal("0"))
+    end
+  end
 end
