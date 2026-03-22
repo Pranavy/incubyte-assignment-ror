@@ -1,0 +1,304 @@
+<% content_for :title, "Dashboard — Incubyte Assignment" %>
+<% content_for :head do %>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+<% end %>
+
+<div class="container py-4">
+  <h1 class="h3 mb-3">Workforce &amp; salary dashboard</h1>
+
+  <p class="text-muted mb-4">
+    Net salary uses TDS rules effective on the selected date (same logic as salary metrics), with defaults 10% (India), 12% (US), 0% elsewhere when no rule applies.
+    Leave <strong>Countries</strong> empty to include all. Job title chart shows the top <strong>N</strong> titles by employee count.
+  </p>
+
+  <div class="card shadow-sm border mb-4">
+    <div class="card-header bg-light py-2">
+      <span class="small fw-semibold">Filters</span>
+    </div>
+    <div class="card-body">
+      <%= form_with url: dashboard_path, method: :get, local: true, class: "row g-3 align-items-end" do %>
+        <div class="col-md-3">
+          <%= label_tag :as_of, "TDS reference date", class: "form-label" %>
+          <%= date_field_tag :as_of, @as_of, class: "form-control" %>
+        </div>
+        <div class="col-md-4">
+          <%= label_tag "countries[]", "Countries (empty = all)", class: "form-label" %>
+          <%= select_tag "countries[]",
+                options_for_select(Countries.options_for_select, @selected_countries),
+                { multiple: true, class: "form-select", size: 5, aria: { label: "Filter by countries" } } %>
+        </div>
+        <div class="col-md-2">
+          <%= label_tag :job_title_top_n, "Top job titles", class: "form-label" %>
+          <%= number_field_tag :job_title_top_n, @job_title_top_n, class: "form-control", min: 1, max: 50, step: 1 %>
+        </div>
+        <div class="col-md-3">
+          <%= submit_tag "Apply filters", class: "btn btn-primary me-2" %>
+          <%= link_to "Reset", dashboard_path, class: "btn btn-outline-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <% q = { as_of: @as_of, job_title_top_n: @job_title_top_n }.merge(@selected_countries.present? ? { countries: @selected_countries } : {}) %>
+  <p class="small text-muted mb-4">
+    JSON: <code class="user-select-all"><%= api_dashboard_charts_path(q) %></code>
+  </p>
+
+  <div class="row g-4 mb-2">
+    <div class="col-lg-6">
+      <div class="card shadow-sm border h-100">
+        <div class="card-header bg-light py-2"><span class="small fw-semibold">Headcount by country</span></div>
+        <div class="card-body chart-wrap">
+          <canvas id="chartHeadcountBar" aria-label="Headcount by country"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card shadow-sm border h-100">
+        <div class="card-header bg-light py-2"><span class="small fw-semibold">Average gross salary by country</span></div>
+        <div class="card-body chart-wrap">
+          <canvas id="chartAvgGrossBar" aria-label="Average gross salary by country"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-2">
+    <div class="col-12">
+      <div class="card shadow-sm border">
+        <div class="card-header bg-light py-2">
+          <span class="small fw-semibold">Headcount share by country</span>
+          <span class="text-muted small ms-1" id="headcountShareSubtitle"></span>
+        </div>
+        <div class="card-body chart-wrap">
+          <canvas id="chartHeadcountShare" aria-label="Headcount share by country"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-2">
+    <div class="col-12">
+      <div class="card shadow-sm border">
+        <div class="card-header bg-light py-2"><span class="small fw-semibold">Average gross vs net salary by country</span></div>
+        <div class="card-body chart-wrap chart-wrap--tall">
+          <canvas id="chartGrossNetCountry" aria-label="Average gross vs net by country"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card shadow-sm border">
+        <div class="card-header bg-light py-2">
+          <span class="small fw-semibold">Average gross salary by job title</span>
+          <span class="text-muted small">(top <%= @job_title_top_n %> by headcount)</span>
+        </div>
+        <div class="card-body chart-wrap chart-wrap--wide">
+          <canvas id="chartJobTitleBar" aria-label="Average gross salary by job title"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="dashboard-chart-json"><%= raw @chart_data.to_json %></script>
+<script>
+  (function () {
+    var jsonEl = document.getElementById("dashboard-chart-json");
+    if (!jsonEl) return;
+
+    function parseData() {
+      try {
+        return JSON.parse(jsonEl.textContent);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function destroyIfRegistered(id) {
+      var canvas = document.getElementById(id);
+      if (!canvas || typeof Chart === "undefined") return;
+      var existing = Chart.getChart(canvas);
+      if (existing) existing.destroy();
+    }
+
+    var palette = [
+      "rgba(13, 110, 253, 0.85)",
+      "rgba(25, 135, 84, 0.85)",
+      "rgba(220, 53, 69, 0.85)",
+      "rgba(253, 126, 20, 0.85)",
+      "rgba(102, 16, 242, 0.85)"
+    ];
+
+    function initCharts() {
+      var data = parseData();
+      if (!data) return;
+
+      var labels = data.headcount_by_country.labels;
+      var shareType = data.headcount_share_chart_type || "pie";
+      var sub = document.getElementById("headcountShareSubtitle");
+      if (sub) {
+        sub.textContent = shareType === "pie" ? "(pie)" : "(bar — more than 6 slices)";
+      }
+
+      destroyIfRegistered("chartHeadcountBar");
+      destroyIfRegistered("chartAvgGrossBar");
+      destroyIfRegistered("chartHeadcountShare");
+      destroyIfRegistered("chartGrossNetCountry");
+      destroyIfRegistered("chartJobTitleBar");
+
+      new Chart(document.getElementById("chartHeadcountBar"), {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Employees",
+              data: data.headcount_by_country.values,
+              backgroundColor: labels.map(function (_, i) {
+                return palette[i % palette.length];
+              })
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+      });
+
+      new Chart(document.getElementById("chartAvgGrossBar"), {
+        type: "bar",
+        data: {
+          labels: data.avg_gross_by_country.labels,
+          datasets: [
+            {
+              label: "Avg gross",
+              data: data.avg_gross_by_country.values,
+              backgroundColor: labels.map(function (_, i) {
+                return palette[i % palette.length];
+              })
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+
+      var shareLabels = data.headcount_share_by_country.labels;
+      var shareData = data.headcount_share_by_country.values;
+      var shareColors = shareLabels.map(function (_, i) {
+        return palette[i % palette.length];
+      });
+
+      if (shareType === "pie") {
+        new Chart(document.getElementById("chartHeadcountShare"), {
+          type: "pie",
+          data: {
+            labels: shareLabels,
+            datasets: [{ data: shareData, backgroundColor: shareColors }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: "bottom" } }
+          }
+        });
+      } else {
+        new Chart(document.getElementById("chartHeadcountShare"), {
+          type: "bar",
+          data: {
+            labels: shareLabels,
+            datasets: [
+              {
+                label: "Employees",
+                data: shareData,
+                backgroundColor: shareColors
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+          }
+        });
+      }
+
+      new Chart(document.getElementById("chartGrossNetCountry"), {
+        type: "bar",
+        data: {
+          labels: data.avg_gross_and_net_by_country.labels,
+          datasets: [
+            {
+              label: "Avg gross",
+              data: data.avg_gross_and_net_by_country.avg_gross,
+              backgroundColor: "rgba(13, 110, 253, 0.75)"
+            },
+            {
+              label: "Avg net",
+              data: data.avg_gross_and_net_by_country.avg_net,
+              backgroundColor: "rgba(25, 135, 84, 0.75)"
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+
+      var jt = data.avg_gross_by_job_title;
+      new Chart(document.getElementById("chartJobTitleBar"), {
+        type: "bar",
+        data: {
+          labels: jt.labels,
+          datasets: [
+            {
+              label: "Avg gross salary",
+              data: jt.values,
+              backgroundColor: "rgba(13, 110, 253, 0.7)"
+            }
+          ]
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { beginAtZero: true } }
+        }
+      });
+    }
+
+    function boot() {
+      if (typeof Chart === "undefined") {
+        setTimeout(boot, 50);
+        return;
+      }
+      initCharts();
+    }
+
+    document.addEventListener("DOMContentLoaded", boot);
+    document.addEventListener("turbo:load", boot);
+    document.addEventListener("turbo:before-cache", function () {
+      [
+        "chartHeadcountBar",
+        "chartAvgGrossBar",
+        "chartHeadcountShare",
+        "chartGrossNetCountry",
+        "chartJobTitleBar"
+      ].forEach(destroyIfRegistered);
+    });
+  })();
+</script>

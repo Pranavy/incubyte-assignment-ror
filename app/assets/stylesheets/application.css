@@ -44,6 +44,20 @@ div.pagination .gap {
   color: var(--bs-secondary-color, #6c757d);
 }
 
+/* Dashboard Chart.js canvases */
+.chart-wrap {
+  position: relative;
+  height: 280px;
+}
+
+.chart-wrap--tall {
+  height: 360px;
+}
+
+.chart-wrap--wide {
+  height: 400px;
+}
+
 /*
  * This is a manifest file that'll be compiled into application.css.
  *

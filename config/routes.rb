@@ -18,9 +18,12 @@ Rails.application.routes.draw do
   get "salary_metrics/job_title", to: "salary_metrics#job_title", as: :salary_metrics_job_title
   get "salary_metrics/country", to: "salary_metrics#country", as: :salary_metrics_country
 
+  get "dashboard", to: "dashboard#show", as: :dashboard
+
   namespace :api do
     get "salary_metrics/by_job_title", to: "salary_metrics#by_job_title"
     get "salary_metrics/by_country", to: "salary_metrics#by_country"
+    get "dashboard/charts", to: "dashboard#charts"
   end
 
   root "home#index"
