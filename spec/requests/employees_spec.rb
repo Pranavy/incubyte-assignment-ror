@@ -74,7 +74,7 @@ RSpec.describe "Employees (admin)", type: :request do
       end
 
       it "paginates with page param when there are more records than per page" do
-        16.times do |i|
+        rows = 16.times.map do |i|
           Employee.create!(
             first_name: "Page",
             last_name: format("E%04d", i),
@@ -83,12 +83,14 @@ RSpec.describe "Employees (admin)", type: :request do
             salary: 48_765
           )
         end
+        oldest, newest = rows.first, rows.last
 
         get employees_path(page: 2)
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include("E0015")
-        expect(response.body).not_to include("E0000")
+        # Index defaults to newest-first; page 2 is older rows only.
+        expect(response.body).to include(oldest.last_name)
+        expect(response.body).not_to include(newest.last_name)
         expect(response.body).to include("pagination")
       end
 
