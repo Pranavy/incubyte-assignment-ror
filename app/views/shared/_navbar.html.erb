@@ -6,6 +6,7 @@
         <%= link_to "Job titles", job_titles_path, class: "nav-link py-1 text-white-50" %>
         <%= link_to "TDS rules", tds_rules_path, class: "nav-link py-1 text-white-50" %>
         <%= link_to "Employees", employees_path, class: "nav-link py-1 text-white-50" %>
+        <%= link_to "Salary metrics", salary_metrics_path, class: "nav-link py-1 text-white-50" %>
         <span class="navbar-text text-white-50 small d-none d-sm-inline"><%= current_admin.email %></span>
         <%= link_to "Sign out", destroy_admin_session_path, data: { turbo_method: :delete }, class: "btn btn-outline-light btn-sm" %>
       <% else %>

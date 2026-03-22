@@ -14,6 +14,8 @@ Rails.application.routes.draw do
   resources :tds_rules, only: %i[index show new create edit update]
   resources :employees, only: %i[index new create show edit update]
 
+  get "salary_metrics", to: "salary_metrics#show", as: :salary_metrics
+
   namespace :api do
     get "salary_metrics/by_job_title", to: "salary_metrics#by_job_title"
   end
