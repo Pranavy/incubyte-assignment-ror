@@ -30,9 +30,12 @@
               <td><%= employee.job_title.title %></td>
               <td><%= Countries.label_for(employee.country) || employee.country %></td>
               <td class="text-end"><%= number_to_currency(employee.salary) %></td>
-              <td class="text-end">
+              <td class="text-end text-nowrap">
                 <%= link_to "View", employee_path(employee), class: "btn btn-sm btn-outline-secondary" %>
                 <%= link_to "Edit", edit_employee_path(employee), class: "btn btn-sm btn-outline-primary" %>
+                <%= button_to "Delete", employee_path(employee), method: :delete,
+                      class: "btn btn-sm btn-outline-danger d-inline-block",
+                      form: { class: "d-inline", data: { turbo_confirm: "Delete #{employee.first_name} #{employee.last_name}?" } } %>
               </td>
             </tr>
           <% end %>

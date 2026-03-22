@@ -33,6 +33,23 @@ RSpec.describe "Employees (admin)", type: :request do
       get new_employee_path
       expect(response).to redirect_to(new_admin_session_path)
     end
+
+    it "redirects to sign in when deleting an employee while signed out" do
+      employee = Employee.create!(
+        first_name: "Del",
+        last_name: "Test",
+        country: "IN",
+        job_title: engineer_title,
+        salary: 10_000
+      )
+
+      expect do
+        delete employee_path(employee)
+      end.not_to change(Employee, :count)
+
+      expect(response).to redirect_to(new_admin_session_path)
+      expect(Employee.exists?(employee.id)).to be true
+    end
   end
 
   describe "when signed in as admin" do
@@ -244,6 +261,26 @@ RSpec.describe "Employees (admin)", type: :request do
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(employee.reload.first_name).to eq("Valid")
+      end
+    end
+
+    describe "DELETE /employees/:id" do
+      it "destroys the employee and redirects to the index with a notice" do
+        employee = Employee.create!(
+          first_name: "To",
+          last_name: "Remove",
+          country: "GB",
+          job_title: engineer_title,
+          salary: 55_000
+        )
+
+        expect do
+          delete employee_path(employee)
+        end.to change(Employee, :count).by(-1)
+
+        expect(response).to redirect_to(employees_path)
+        expect(flash[:notice]).to include("successfully deleted")
+        expect(Employee.exists?(employee.id)).to be false
       end
     end
   end

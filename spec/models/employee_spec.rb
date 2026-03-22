@@ -20,6 +20,11 @@ RSpec.describe Employee, type: :model do
       employee = described_class.create!(valid_attributes)
       expect(employee.job_title).to eq(job_title)
     end
+
+    it "can be destroyed" do
+      employee = described_class.create!(valid_attributes)
+      expect { employee.destroy! }.to change(described_class, :count).by(-1)
+    end
   end
 
   describe "validations" do

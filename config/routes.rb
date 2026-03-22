@@ -12,7 +12,7 @@ Rails.application.routes.draw do
 
   resources :job_titles, except: :destroy
   resources :tds_rules, only: %i[index show new create edit update]
-  resources :employees, only: %i[index new create show edit update]
+  resources :employees, only: %i[index new create show edit update destroy]
 
   get "salary_metrics", to: redirect("/salary_metrics/job_title")
   get "salary_metrics/job_title", to: "salary_metrics#job_title", as: :salary_metrics_job_title

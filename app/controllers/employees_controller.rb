@@ -2,7 +2,7 @@
 
 class EmployeesController < ApplicationController
   before_action :authenticate_admin!
-  before_action :set_employee, only: %i[show edit update]
+  before_action :set_employee, only: %i[show edit update destroy]
   before_action :load_job_titles, only: %i[index new create edit update]
 
   def index
@@ -36,6 +36,11 @@ class EmployeesController < ApplicationController
       flash.now[:alert] = "Employee could not be updated. Please fix the errors below."
       render :edit, status: :unprocessable_content
     end
+  end
+
+  def destroy
+    @employee.destroy!
+    redirect_to employees_path, notice: "Employee was successfully deleted."
   end
 
   private

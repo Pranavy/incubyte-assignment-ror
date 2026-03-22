@@ -8,9 +8,14 @@
     </ol>
   </nav>
 
-  <div class="d-flex justify-content-between align-items-start mb-3">
+  <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
     <h1 class="h3 mb-0"><%= @employee.first_name %> <%= @employee.last_name %></h1>
-    <%= link_to "Edit", edit_employee_path(@employee), class: "btn btn-primary" %>
+    <div class="d-flex gap-2">
+      <%= link_to "Edit", edit_employee_path(@employee), class: "btn btn-primary" %>
+      <%= button_to "Delete", employee_path(@employee), method: :delete,
+            class: "btn btn-outline-danger",
+            form: { data: { turbo_confirm: "Delete this employee? This cannot be undone." } } %>
+    </div>
   </div>
 
   <dl class="row">
