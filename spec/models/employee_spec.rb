@@ -108,5 +108,17 @@ RSpec.describe Employee, type: :model do
         described_class.build_criteria({ fltrs: { unknown_field: "x" } })
       end.not_to raise_error
     end
+
+    it "orders newest first when no sort is specified" do
+      older = described_class.create!(valid_attributes.merge(first_name: "Older"))
+      newer = described_class.create!(valid_attributes.merge(first_name: "Newer"))
+      older.update_columns(created_at: 2.days.ago, updated_at: 2.days.ago)
+      newer.update_columns(created_at: 1.day.ago, updated_at: 1.day.ago)
+
+      result = described_class.build_criteria({})
+
+      expect(result.first).to eq(newer)
+      expect(result.second).to eq(older)
+    end
   end
 end

@@ -32,7 +32,7 @@ class Employee < ApplicationRecord
   end
 
   def self.default_build_criteria_order(relation)
-    relation.order(:last_name, :first_name)
+    relation.order(created_at: :desc, id: :desc)
   end
 
   def full_name
