@@ -1,0 +1,72 @@
+<% content_for :title, "Salary metrics by country — Incubyte Assignment" %>
+
+<div class="container py-4">
+  <h1 class="h3 mb-2">Salary metrics by country</h1>
+  <p class="text-muted mb-4">
+    <%= link_to "Salary metrics by job title", salary_metrics_job_title_path, class: "text-decoration-none" %>
+  </p>
+
+  <p class="text-muted mb-4">
+    <strong>Gross</strong> figures use stored employee salaries.
+    <strong>Net</strong> uses TDS rules effective on the selected date, with defaults of 10% (India), 12% (United States), and 0% for other countries when no rule applies.
+  </p>
+
+  <div class="card shadow-sm border mb-4">
+    <div class="card-body">
+      <%= form_with url: salary_metrics_country_path, method: :get, local: true, class: "row g-3 align-items-end" do %>
+        <div class="col-md-6">
+          <%= label_tag :country, "Country", class: "form-label" %>
+          <%= select_tag :country,
+                options_for_select([["Select a country…", ""]] + Countries.options_for_select, @country_param),
+                { class: "form-select", required: true } %>
+        </div>
+        <div class="col-md-4">
+          <%= label_tag :as_of, "As of (for TDS rules)", class: "form-label" %>
+          <%= date_field_tag :as_of, @as_of, class: "form-control" %>
+        </div>
+        <div class="col-md-2">
+          <%= submit_tag "Show metrics", name: nil, class: "btn btn-primary w-100" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @country_param.present? && @metrics_country.nil? %>
+    <div class="alert alert-warning" role="alert">
+      That country code is not valid.
+    </div>
+  <% elsif @metrics_country.present? %>
+    <div class="card shadow-sm border">
+      <div class="card-header bg-light">
+        <strong><%= Countries.label_for(@metrics_country[:country]) || @metrics_country[:country] %></strong>
+        <span class="text-muted small ms-2">(<%= @metrics_country[:country] %>)</span>
+      </div>
+      <div class="card-body">
+        <% if @metrics_country[:avg_gross_salary].nil? %>
+          <p class="text-muted mb-0">No employees in this country. Min, max, and averages are not available.</p>
+        <% else %>
+          <dl class="row mb-0">
+            <dt class="col-sm-4 col-md-3">Minimum gross salary</dt>
+            <dd class="col-sm-8 col-md-9"><%= number_to_currency(@metrics_country[:min_gross_salary]) %></dd>
+            <dt class="col-sm-4 col-md-3">Maximum gross salary</dt>
+            <dd class="col-sm-8 col-md-9"><%= number_to_currency(@metrics_country[:max_gross_salary]) %></dd>
+            <dt class="col-sm-4 col-md-3">Average gross salary</dt>
+            <dd class="col-sm-8 col-md-9"><%= number_to_currency(@metrics_country[:avg_gross_salary]) %></dd>
+            <dt class="col-sm-4 col-md-3">Minimum net salary</dt>
+            <dd class="col-sm-8 col-md-9"><%= number_to_currency(@metrics_country[:min_net_salary]) %></dd>
+            <dt class="col-sm-4 col-md-3">Maximum net salary</dt>
+            <dd class="col-sm-8 col-md-9"><%= number_to_currency(@metrics_country[:max_net_salary]) %></dd>
+            <dt class="col-sm-4 col-md-3">Average net salary</dt>
+            <dd class="col-sm-8 col-md-9"><%= number_to_currency(@metrics_country[:avg_net_salary]) %></dd>
+            <dt class="col-sm-4 col-md-3">TDS reference date</dt>
+            <dd class="col-sm-8 col-md-9"><%= l(@as_of) %></dd>
+          </dl>
+        <% end %>
+      </div>
+      <div class="card-footer small text-muted">
+        JSON:
+        <code class="user-select-all"><%= api_salary_metrics_by_country_path(country: @metrics_country[:country], as_of: @as_of) %></code>
+      </div>
+    </div>
+  <% end %>
+</div>
