@@ -76,44 +76,6 @@ Use `bin/rails routes` for the full list.
 6. **Salary metrics** — pick a **TDS reference date** (`as_of`) and either a **job title** or **country** to see averages and per-employee gross/net.
 7. **Dashboard** — multi-chart view driven by **`Dashboard::ChartData`**; optional JSON at **`/api/dashboard/charts`** with the same filter query params.
 
-## Screenshots
-
-Images are stored under [`docs/screenshots/`](docs/screenshots/).
-
-### Home
-
-![Home page](docs/screenshots/HomePage.png)
-
-### Employees
-
-![Employee listing](docs/screenshots/EmployeeListing.png)
-
-![Employee create form](docs/screenshots/EmployeeCreateForm.png)
-
-![Employee filters](docs/screenshots/EmployeeFilterForm.png)
-
-### Job titles
-
-![Job title listing](docs/screenshots/JobTitleListing.png)
-
-### TDS rules
-
-![TDS rules listing](docs/screenshots/TDSRulesListing.png)
-
-![TDS rule create form](docs/screenshots/TDSRuleCreateForm.png)
-
-### Salary metrics
-
-![Salary metrics by job title](docs/screenshots/SalaryMetricsByJobTitle.png)
-
-![Salary metrics by country](docs/screenshots/SalaryMetricsByCountry.png)
-
-### Dashboard
-
-![Dashboard — filters and charts](docs/screenshots/Dashboard1.png)
-
-![Dashboard — charts (continued)](docs/screenshots/Dashboard2.png)
-
 ## Dashboard: metrics and filters
 
 The dashboard (`DashboardController#show`) loads **`Dashboard::ChartData`** with:
@@ -173,3 +135,45 @@ Seeds do **not** create an **Admin**; use sign-up or the console (see [Run the a
 
 - **Pagination:** `WillPaginate.per_page` is set in `config/initializers/will_paginate.rb` (default **10** for listing pages that use `.paginate`).
 - **TDS / countries:** Country lists and labels come from the `Countries` module; keep employee and TDS `country` values aligned with those keys.
+
+## Screenshots
+
+Images are stored under [`docs/screenshots/`](docs/screenshots/).
+
+### Home
+
+![Home page](docs/screenshots/HomePage.png)
+
+### Employees
+
+![Employee listing](docs/screenshots/EmployeeListing.png)
+
+![Employee create form](docs/screenshots/EmployeeCreateForm.png)
+
+![Employee filters](docs/screenshots/EmployeeFilterForm.png)
+
+### Job titles
+
+![Job title listing](docs/screenshots/JobTitleListing.png)
+
+### TDS rules
+
+![TDS rules listing](docs/screenshots/TDSRulesListing.png)
+
+![TDS rule create form](docs/screenshots/TDSRuleCreateForm.png)
+
+### Salary metrics
+
+![Salary metrics by job title](docs/screenshots/SalaryMetricsByJobTitle.png)
+
+![Salary metrics by country](docs/screenshots/SalaryMetricsByCountry.png)
+
+### Dashboard
+
+![Dashboard — filters and charts](docs/screenshots/Dashboard1.png)
+
+![Dashboard — charts (continued)](docs/screenshots/Dashboard2.png)
+
+### RSpec Tests 
+
+![RSpec](docs/screenshots/RSpecTests.png)
